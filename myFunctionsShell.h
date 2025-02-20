@@ -57,7 +57,21 @@ void getLocation();
 void logout(char *input);
 
 void echo(char **arguments);
-void cd(char **);
+/**
+ * Changes the current working directory of the shell.
+ *
+ * This function updates the working directory of MyShell based on the user input.
+ * It correctly handles directories with spaces and absolute/relative paths.
+ *
+ * @param args A pointer to an array of strings containing the directory path.
+ *             The first element is "cd", and the second element is the target path.
+ *
+ * @note If no directory is specified, it defaults to the home directory.
+ * @note If the directory does not exist, an error message is displayed.
+ * 
+ * @warning Ensure the input is valid to prevent errors.
+ */
+void cd(char **args);
 void cp(char **arguments);
 void get_dir();
 void delete(char **arguments);
