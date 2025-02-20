@@ -13,40 +13,41 @@ int main(int argc, char const *argv[])
         int isPipe = 2;
         int isEchoWrith = 0;
         int isEchoPpend = 0;
-
-        getLocation();
-
-        input = getInputFromUser();
-        puts(input);
-
-        if (strncmp(input, "exit", 4) == 0) {
-            logout(input);
-            free(input);  // ✅ Free input before exit
-            exit(0);      // ✅ Ensure shell fully terminates
-        }
-{
-    logout(input);
     
-    free(input);  // ✅ Free input before exit
-
-    if (arguments) {  // ✅ Ensure arguments are freed if allocated
-        for (int i = 0; arguments[i] != NULL; i++) {
-            free(arguments[i]);
+        getLocation();
+    
+        char *input = getInputFromUser();
+        if (input == NULL) {
+            printf("DEBUG: getInputFromUser() returned NULL, breaking loop\n");
+            break;
         }
-        free(arguments);
-    }
-
-    exit(0);  // ✅ Shell process is fully terminated
-}
-
-
-        arguments = splitArguments(input);  // ✅ Ensure this happens after exit check
-
-        if (strncmp(input, "cd", 2) == 0)
-        {
+    
+        char **arguments = splitArguments(input);
+        if (arguments == NULL || arguments[0] == NULL) {
+            printf("DEBUG: splitArguments() returned NULL or empty, skipping...\n");
+            free(input);
+            continue;
+        }
+    
+        // ✅ Fix: Handle "exit" properly
+        if (strncmp(arguments[0], "exit", 4) == 0) {
+            logout(input);
+            free(input);
+            free(arguments);
+            exit(0);  // ✅ Shell process is fully terminated
+        }
+    
+        // ✅ Fix: Ensure "cd" command works correctly
+        if (strncmp(arguments[0], "cd", 2) == 0) {
+            printf("DEBUG: Calling cd()\n");
             cd(arguments);
-            continue;  // Keep the shell running
-        }       
+            printf("DEBUG: Returned from cd(), MyShell should still be running\n");
+    
+            free(input);
+            free(arguments);
+            continue;  // ✅ Ensures the loop continues running after cd()
+        }
+    
         else if (strncmp(input, "echo", 4) == 0)
         {
             if (isEchoWrith)
@@ -77,17 +78,18 @@ int main(int argc, char const *argv[])
             systemCall(arguments);
             wait(NULL);
         }
-
-        // ✅ Free arguments properly after execution
+    
+        // ✅ Fix: Free memory properly after execution
         if (arguments) {
             for (int i = 0; arguments[i] != NULL; i++) {
                 free(arguments[i]);
             }
             free(arguments);
         }
-
+    
         free(input);  // ✅ Free input only once per loop
     }
+    
 
     return 0;
 }

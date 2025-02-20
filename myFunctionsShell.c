@@ -1,4 +1,5 @@
 #include "myFunctionsShell.h"
+#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <limits.h>
@@ -54,23 +55,21 @@ char **splitArguments(char *str)
 }
 
 void getLocation() {
-    char hostname[HOST_NAME_MAX];
-    char cwd[PATH_MAX];
-    struct passwd *pw;
-    char *username;
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        printf("Error getting current directory\n");
+        return;
+    }
 
-    // Get username
-    pw = getpwuid(getuid());
-    username = pw ? pw->pw_name : "unknown";
-
-    // Get hostname
+    char hostname[1024];
     gethostname(hostname, sizeof(hostname));
 
-    // Get current working directory
-    getcwd(cwd, sizeof(cwd));
+    char *username = getenv("USER");
 
-    // Print the location in terminal
-    printf("\033[1;33m(MyShell) \033[1;32m%s@\033[1;36m%s\033[1;37m:%s$\033[0m ", username, hostname, cwd);
+    // ✅ Color Fix: Make the username cyan and the path yellow
+    printf("\033[1;35m(MyShell) \033[1;36m%s@%s:\033[1;33m%s\033[0m$ ", 
+           username, hostname, cwd);
+    fflush(stdout);
 }
 
 void logout(char *input) {
@@ -163,35 +162,33 @@ void echo(char **arguments)
 }
 void cd(char **arguments) {
     if (arguments[1] == NULL) {
-        // No arguments: Change to home directory
         char *home = getenv("HOME");
         if (home == NULL) {
             printf("-myShell: cd: HOME not set\n");
-        } else {
-            chdir(home);
+            return;
+        }
+        if (chdir(home) != 0) {
+            printf("-myShell: cd: %s: %s\n", home, strerror(errno));
         }
         return;
     }
 
-    // Concatenate all arguments into a single path (fixes "too many arguments")
-    char path[PATH_MAX] = "";
+    // ✅ Join arguments into a valid path using `/`
+    char path[1024] = "";
     for (int i = 1; arguments[i] != NULL; i++) {
         strcat(path, arguments[i]);
         if (arguments[i + 1] != NULL) {
-            strcat(path, " ");  // Preserve spaces in paths
+            strcat(path, "/");  // ✅ Join folders with `/`
         }
     }
 
-    // Remove surrounding quotes if present
-    size_t len = strlen(path);
-    if (len > 1 && path[0] == '"' && path[len - 1] == '"') {
-        path[len - 1] = '\0';
-        memmove(path, path + 1, len - 1);
-    }
+    printf("DEBUG: cd() received path: %s\n", path);
 
-    // Change directory
+    // ✅ Try to change directory
     if (chdir(path) != 0) {
-        printf("-myShell: cd: %s: No such file or directory\n", path);
+        printf("-myShell: cd: %s: %s\n", path, strerror(errno));
+    } else {
+        printf("DEBUG: Successfully changed directory to %s\n", path);
     }
 }
 
