@@ -3,9 +3,11 @@
 
 int main(int argc, char const *argv[])
 {
-    
-
     welcome();
+    
+    char *input;
+    char **arguments = NULL;  // ✅ Ensure arguments is declared before use
+
     while (1)
     {
         int isPipe = 2;
@@ -14,22 +16,34 @@ int main(int argc, char const *argv[])
 
         getLocation();
 
-        char *input = getInputFromUser();
+        input = getInputFromUser();
         puts(input);
-        
-        if (strncmp(input, "exit",4) == 0)
-        {
-            puts("Exit");
-            logout(input);
-        }
 
-        char **arguments = splitArguments(input);
-        
+        // Handle "exit" command properly
+        if (strncmp(input, "exit", 4) == 0)
+{
+    logout(input);
+    
+    free(input);  // ✅ Free input before exit
+
+    if (arguments) {  // ✅ Ensure arguments are freed if allocated
+        for (int i = 0; arguments[i] != NULL; i++) {
+            free(arguments[i]);
+        }
+        free(arguments);
+    }
+
+    exit(0);  // ✅ Shell process is fully terminated
+}
+
+
+        arguments = splitArguments(input);  // ✅ Ensure this happens after exit check
+
         if (strcmp(input, "cd") == 0)
         {
             cd(arguments);
         }
-        else if (strncmp(input, "echo",4) == 0)
+        else if (strncmp(input, "echo", 4) == 0)
         {
             if (isEchoWrith)
                 echowrite(arguments);
@@ -60,12 +74,21 @@ int main(int argc, char const *argv[])
             wait(NULL);
         }
 
-        free(input);
+        // ✅ Free arguments properly after execution
+        if (arguments) {
+            for (int i = 0; arguments[i] != NULL; i++) {
+                free(arguments[i]);
+            }
+            free(arguments);
+        }
+
+        free(input);  // ✅ Free input only once per loop
     }
 
     return 0;
-    
 }
+
+
 void welcome()
 {
     printf("\033[1;30m================================================================================\033[0m\n");

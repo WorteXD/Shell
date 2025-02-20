@@ -84,12 +84,11 @@ void getLocation()
     printf("\033[1;32m%s\033[0m@\033[1;36m%s\033[0m:\033[34m%s\033[0m$ ", username, hostname, cwd);
 }
 
-// Function to trim all leading and trailing spaces
-
+// Function to trim ALL leading and trailing spaces
 char *trimSpaces(char *str) {
     while (*str && isspace((unsigned char)*str)) str++;  // Remove leading spaces
 
-    if (*str == '\0') return str;  // If only spaces, return empty
+    if (*str == '\0') return str;  // If string is empty, return
 
     char *end = str + strlen(str) - 1;
     while (end > str && isspace((unsigned char)*end)) end--;  // Remove trailing spaces
@@ -99,12 +98,12 @@ char *trimSpaces(char *str) {
 }
 
 void logout(char *input) {
-    input = trimSpaces(input);  // Trim spaces before checking command
+    input = trimSpaces(input);  // ✅ Trim spaces before checking
 
-    if (strcmp(input, "exit") == 0) {  // ✅ Works even with extra spaces!
+    if (strcmp(input, "exit") == 0) {  // ✅ Works even with spaces!
         printf("\033[1;31mExiting MyShell... Goodbye!\033[0m\n");
-        fflush(stdout);  // Ensure output is printed before exiting
-        exit(0);  // ✅ Terminate shell immediately
+        fflush(stdout);  
+        exit(0);  // ✅ Shell terminates immediately
     } else {
         printf("\033[1;33m[ERROR] Invalid usage: Use 'exit' without extra arguments.\033[0m\n");
         fflush(stdout);
