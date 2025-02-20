@@ -29,6 +29,19 @@ char *getInputFromUser();
  *          the returned array and its elements using free().
  */
 char **splitArguments(char *);
+/**
+ * Retrieves and displays the current working directory, username, and hostname.
+ *
+ * This function replicates the behavior of a standard Linux terminal prompt.
+ * It displays:
+ * - The username in **green**.
+ * - The hostname in **cyan**.
+ * - The current working directory in **blue**.
+ * - A `$` symbol at the end.
+ *
+ * @note This function should be called whenever the shell needs to display a prompt.
+ *       It does not return any value but directly prints the formatted prompt.
+ */
 void getLocation();
 void logout(char *input);
 void echo(char **arguments);
