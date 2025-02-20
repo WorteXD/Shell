@@ -17,14 +17,12 @@ int main(int argc, char const *argv[])
         getLocation();
     
         char *input = getInputFromUser();
-        if (input == NULL) {
-            printf("DEBUG: getInputFromUser() returned NULL, breaking loop\n");
+        if (input == NULL) {            
             break;
         }
     
         char **arguments = splitArguments(input);
         if (arguments == NULL || arguments[0] == NULL) {
-            printf("DEBUG: splitArguments() returned NULL or empty, skipping...\n");
             free(input);
             continue;
         }
@@ -39,10 +37,7 @@ int main(int argc, char const *argv[])
     
         // ✅ Fix: Ensure "cd" command works correctly
         if (strncmp(arguments[0], "cd", 2) == 0) {
-            printf("DEBUG: Calling cd()\n");
             cd(arguments);
-            printf("DEBUG: Returned from cd(), MyShell should still be running\n");
-    
             free(input);
             free(arguments);
             continue;  // ✅ Ensures the loop continues running after cd()

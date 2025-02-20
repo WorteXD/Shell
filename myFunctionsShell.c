@@ -182,13 +182,9 @@ void cd(char **arguments) {
         }
     }
 
-    printf("DEBUG: cd() received path: %s\n", path);
-
-    // ✅ Try to change directory
+        // ✅ Try to change directory
     if (chdir(path) != 0) {
-        printf("-myShell: cd: %s: %s\n", path, strerror(errno));
-    } else {
-        printf("DEBUG: Successfully changed directory to %s\n", path);
+        printf("-myShell: cd: %s: %s\n", path, strerror(errno));    
     }
 }
 
