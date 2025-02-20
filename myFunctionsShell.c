@@ -53,35 +53,24 @@ char **splitArguments(char *str)
     return args;
 }
 
-void getLocation() 
-{
-    char cwd[PATH_MAX];  
-    char hostname[HOST_NAME_MAX];  
-    struct passwd *pw;  
+void getLocation() {
+    char hostname[HOST_NAME_MAX];
+    char cwd[PATH_MAX];
+    struct passwd *pw;
     char *username;
 
-    // Get the current working directory
-    if (getcwd(cwd, sizeof(cwd)) == NULL) {
-        perror("getcwd error");
-        return;
-    }
-
-    // Get the hostname
-    if (gethostname(hostname, sizeof(hostname)) != 0) {
-        perror("gethostname error");
-        return;
-    }
-
-    // Get the username
+    // Get username
     pw = getpwuid(getuid());
-    if (pw) {
-        username = pw->pw_name;
-    } else {
-        username = "unknown";
-    }
+    username = pw ? pw->pw_name : "unknown";
 
-    // Print the formatted prompt, mimicking the original terminal style
-    printf("\033[1;32m%s\033[0m@\033[1;36m%s\033[0m:\033[34m%s\033[0m$ ", username, hostname, cwd);
+    // Get hostname
+    gethostname(hostname, sizeof(hostname));
+
+    // Get current working directory
+    getcwd(cwd, sizeof(cwd));
+
+    // Print the location in terminal
+    printf("\033[1;33m(MyShell) \033[1;32m%s@\033[1;36m%s\033[1;37m:%s$\033[0m ", username, hostname, cwd);
 }
 
 void logout(char *input) {
@@ -172,15 +161,40 @@ void echo(char **arguments)
 
     puts("");
 }
-void cd(char **arguments)
-{
+void cd(char **arguments) {
+    if (arguments[1] == NULL) {
+        // No arguments: Change to home directory
+        char *home = getenv("HOME");
+        if (home == NULL) {
+            printf("-myShell: cd: HOME not set\n");
+        } else {
+            chdir(home);
+        }
+        return;
+    }
 
-    if (strncmp(arguments[1], "\"", 1) != 0 && arguments[2] != NULL)
-        printf("-myShell: cd: too many arguments\n");
+    // Concatenate all arguments into a single path (fixes "too many arguments")
+    char path[PATH_MAX] = "";
+    for (int i = 1; arguments[i] != NULL; i++) {
+        strcat(path, arguments[i]);
+        if (arguments[i + 1] != NULL) {
+            strcat(path, " ");  // Preserve spaces in paths
+        }
+    }
 
-    else if (chdir(arguments[1]) != 0)
-        printf("-myShell: cd: %s: No such file or directory\n", arguments[1]);
+    // Remove surrounding quotes if present
+    size_t len = strlen(path);
+    if (len > 1 && path[0] == '"' && path[len - 1] == '"') {
+        path[len - 1] = '\0';
+        memmove(path, path + 1, len - 1);
+    }
+
+    // Change directory
+    if (chdir(path) != 0) {
+        printf("-myShell: cd: %s: No such file or directory\n", path);
+    }
 }
+
 void cp(char **arguments)
 {
     char ch;
