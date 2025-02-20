@@ -1,5 +1,9 @@
 #include "myFunctionsShell.h"
-
+#include <stdio.h>
+#include <unistd.h>
+#include <limits.h>
+#include <pwd.h>        // Required for getpwuid()
+#include <sys/types.h>  // Required for user ID functions
 char *getInputFromUser()
 {
 
@@ -28,15 +32,34 @@ char **splitArguments(char *input)
     return NULL;
 }
 
-void getLocation()
-{
-    char location[256];
-    if (getcwd(location, sizeof(location)) == NULL)
-    {
-        puts("Error");
+void getLocation() {
+    char cwd[PATH_MAX];  
+    char hostname[HOST_NAME_MAX];  
+    struct passwd *pw;  
+    char *username;
+
+    // Get the current working directory
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("getcwd error");
         return;
     }
-    printf("%s", location);
+
+    // Get the hostname
+    if (gethostname(hostname, sizeof(hostname)) != 0) {
+        perror("gethostname error");
+        return;
+    }
+
+    // Get the username
+    pw = getpwuid(getuid());
+    if (pw) {
+        username = pw->pw_name;
+    } else {
+        username = "unknown";
+    }
+
+    // Print the formatted prompt, mimicking the original terminal style
+    printf("\033[1;32m%s\033[0m@\033[1;36m%s\033[0m:\033[34m%s\033[0m$ ", username, hostname, cwd);
 }
 
 void logout(char *input)
