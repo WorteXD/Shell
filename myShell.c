@@ -3,6 +3,7 @@
 
 int main(int argc, char const *argv[])
 {
+    
 
     welcome();
     while (1)
@@ -23,7 +24,7 @@ int main(int argc, char const *argv[])
         }
 
         char **arguments = splitArguments(input);
-
+        
         if (strcmp(input, "cd") == 0)
         {
             cd(arguments);
@@ -63,6 +64,7 @@ int main(int argc, char const *argv[])
     }
 
     return 0;
+    
 }
 void welcome()
 {
