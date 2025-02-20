@@ -84,31 +84,34 @@ void getLocation()
     printf("\033[1;32m%s\033[0m@\033[1;36m%s\033[0m:\033[34m%s\033[0m$ ", username, hostname, cwd);
 }
 
-// Function to trim ALL leading and trailing spaces
-char *trimSpaces(char *str) {
-    while (*str && isspace((unsigned char)*str)) str++;  // Remove leading spaces
-
-    if (*str == '\0') return str;  // If string is empty, return
-
-    char *end = str + strlen(str) - 1;
-    while (end > str && isspace((unsigned char)*end)) end--;  // Remove trailing spaces
-
-    *(end + 1) = '\0';  // Null-terminate after last non-space character
-    return str;
-}
-
 void logout(char *input) {
-    input = trimSpaces(input);  // ✅ Trim spaces before checking
+    char **args = splitArguments(input);  // ✅ Use splitArguments() for proper parsing
 
-    if (strcmp(input, "exit") == 0) {  // ✅ Works even with spaces!
-        printf("\033[1;31mExiting MyShell... Goodbye!\033[0m\n");
-        fflush(stdout);  
-        exit(0);  // ✅ Shell terminates immediately
-    } else {
-        printf("\033[1;33m[ERROR] Invalid usage: Use 'exit' without extra arguments.\033[0m\n");
-        fflush(stdout);
+    if (args[0] && strcmp(args[0], "exit") == 0) {
+        if (args[1] == NULL) {  // ✅ No extra words after "exit", so exit normally
+            printf("\033[1;31mExiting MyShell... Goodbye!\033[0m\n");
+            fflush(stdout);
+
+            // ✅ Free allocated memory before exiting
+            for (int i = 0; args[i] != NULL; i++) {
+                free(args[i]);
+            }
+            free(args);
+
+            exit(0);
+        } else {
+            printf("\033[1;33m[ERROR] Invalid usage: Use 'exit' without extra arguments.\033[0m\n");
+            fflush(stdout);
+        }
     }
+
+    // ✅ Free memory allocated by splitArguments()
+    for (int i = 0; args[i] != NULL; i++) {
+        free(args[i]);
+    }
+    free(args);
 }
+
 
 void systemCall(char **arguments)
 {

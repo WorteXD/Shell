@@ -19,8 +19,11 @@ int main(int argc, char const *argv[])
         input = getInputFromUser();
         puts(input);
 
-        // Handle "exit" command properly
-        if (strncmp(input, "exit", 4) == 0)
+        if (strncmp(input, "exit", 4) == 0) {
+            logout(input);
+            free(input);  // ✅ Free input before exit
+            exit(0);      // ✅ Ensure shell fully terminates
+        }
 {
     logout(input);
     
