@@ -42,10 +42,11 @@ int main(int argc, char const *argv[])
 
         arguments = splitArguments(input);  // ✅ Ensure this happens after exit check
 
-        if (strcmp(input, "cd") == 0)
+        if (strncmp(input, "cd", 2) == 0)
         {
             cd(arguments);
-        }
+            continue;  // Keep the shell running
+        }       
         else if (strncmp(input, "echo", 4) == 0)
         {
             if (isEchoWrith)

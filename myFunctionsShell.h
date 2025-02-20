@@ -43,7 +43,19 @@ char **splitArguments(char *);
  *       It does not return any value but directly prints the formatted prompt.
  */
 void getLocation();
+/**
+ * Exits the shell properly.
+ *
+ * This function handles the "exit" command and ensures the shell terminates correctly.
+ * It trims unnecessary spaces, checks if the command is valid, prints a farewell message,
+ * and then exits the shell using exit(0).
+ *
+ * @param input A pointer to the string entered by the user.
+ *
+ * @note If the input contains extra text after "exit", an error message is displayed.
+ */
 void logout(char *input);
+
 void echo(char **arguments);
 void cd(char **);
 void cp(char **arguments);
