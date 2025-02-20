@@ -21,18 +21,40 @@ char *getInputFromUser()
     return input;
 }
 
-char **splitArguments(char *input)
+char **splitArguments(char *str)
 {
+    if (str == NULL) return NULL;
 
-    char **arguments = (char **)malloc(sizeof(char *) * 7);
-    arguments[0] = input;
-    arguments[1] = input + 4;
-    arguments[2] = input + 7;
+    int size = 10;  // Initial size of the array
+    int index = 0;
+    char **args = malloc(size * sizeof(char *));
+    if (!args) {
+        perror("malloc failed");
+        return NULL;
+    }
 
-    return NULL;
+    char *token = strtok(str, " ");
+    while (token) {
+        if (index >= size - 1) {
+            size *= 2;  // Double the size if needed
+            args = realloc(args, size * sizeof(char *));
+            if (!args) {
+                perror("realloc failed");
+                return NULL;
+            }
+        }
+
+        args[index] = strdup(token); // Copy token into allocated memory
+        index++;
+        token = strtok(NULL, " ");
+    }
+    args[index] = NULL; // Null-terminate the array
+
+    return args;
 }
 
-void getLocation() {
+void getLocation() 
+{
     char cwd[PATH_MAX];  
     char hostname[HOST_NAME_MAX];  
     struct passwd *pw;  
@@ -62,12 +84,31 @@ void getLocation() {
     printf("\033[1;32m%s\033[0m@\033[1;36m%s\033[0m:\033[34m%s\033[0m$ ", username, hostname, cwd);
 }
 
-void logout(char *input)
-{
+// Function to trim all leading and trailing spaces
 
-    free(input);
-    puts("logout");
-    exit(EXIT_SUCCESS);
+char *trimSpaces(char *str) {
+    while (*str && isspace((unsigned char)*str)) str++;  // Remove leading spaces
+
+    if (*str == '\0') return str;  // If only spaces, return empty
+
+    char *end = str + strlen(str) - 1;
+    while (end > str && isspace((unsigned char)*end)) end--;  // Remove trailing spaces
+
+    *(end + 1) = '\0';  // Null-terminate after last non-space character
+    return str;
+}
+
+void logout(char *input) {
+    input = trimSpaces(input);  // Trim spaces before checking command
+
+    if (strcmp(input, "exit") == 0) {  // ✅ Works even with extra spaces!
+        printf("\033[1;31mExiting MyShell... Goodbye!\033[0m\n");
+        fflush(stdout);  // Ensure output is printed before exiting
+        exit(0);  // ✅ Terminate shell immediately
+    } else {
+        printf("\033[1;33m[ERROR] Invalid usage: Use 'exit' without extra arguments.\033[0m\n");
+        fflush(stdout);
+    }
 }
 
 void systemCall(char **arguments)
