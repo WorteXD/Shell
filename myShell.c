@@ -52,12 +52,15 @@ int main(int argc, char const *argv[])
         {
             if (isEchoWrith)
                 echowrite(arguments);
-            else if (isEchoPpend)
+            else if (strncmp(input, "echoppend", 9) == 0)
+            {
                 echoppend(arguments);
+            }
+
             else
                 echo(arguments);
         }
-        else if (strcmp(arguments[0], "mv") == 0) 
+        else if (strcmp(arguments[0], "mv") == 0)
         {
             move(arguments);
         }

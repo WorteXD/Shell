@@ -130,7 +130,32 @@ void systemCall(char **arguments);
  *       Both child processes will be waited on using `wait()`.
  */
 void mypipe(char **args1, char **args2);
+/**
+ * Moves or renames a file or directory.
+ *
+ * This function allows renaming a file or directory or moving it to a different location.
+ * It takes two arguments: the source path and the destination path.
+ * The function utilizes `rename()` to perform the move operation.
+ *
+ * @param args A pointer to an array of strings (char**), where:
+ *             args[1] is the source file/directory path.
+ *             args[2] is the destination file/directory path.
+ *
+ * @note If the source or destination path is missing, an error message is displayed.
+ *       If the operation fails due to invalid paths or permissions, an appropriate error is printed.
+ *       The function ensures proper handling of paths with spaces.
+ *
+ * @warning Ensure correct paths are provided to avoid unintended file movements or renaming.
+ */
 void move(char **args);
+/**
+ * @brief Appends text to a file.
+ * 
+ * This function takes a filename and appends text to it. The text does not require quotes.
+ * If the file does not exist, an error message is displayed.
+ * 
+ * @param args The command-line arguments, where args[1] is the filename and args[2+] is the text to append.
+ */
 void echoppend(char **args);
 void echowrite(char **args);
 void _read(char **args);

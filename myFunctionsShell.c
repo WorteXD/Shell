@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <limits.h>
 #include <pwd.h>        // Required for getpwuid()
 #include <sys/types.h>  // Required for user ID functions
@@ -70,7 +71,7 @@ void getLocation() {
     char *username = getenv("USER");
 
     // ✅ Color Fix: Make the username cyan and the path yellow
-    printf("\033[1;35m(MyShell) \033[1;36m%s@%s:\033[1;33m%s\033[0m$ ", 
+    printf("\033[1;36m%s@%s:\033[1;33m%s\033[0m$ ", 
            username, hostname, cwd);
     fflush(stdout);
 }
@@ -196,7 +197,27 @@ void move(char **args) {
     }
 }
 
-void echoppend(char **args) {}
+void echoppend(char **args) {
+    if (args[1] == NULL || args[2] == NULL) {
+        perror("-myShell: echoppend: missing arguments");
+        return;
+    }
+
+    int fd = open(args[1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (fd == -1) {
+        perror("-myShell: echoppend: error opening file");
+        return;
+    }
+
+    for (int i = 2; args[i] != NULL; i++) {
+        write(fd, args[i], strlen(args[i]));
+        if (args[i + 1] != NULL) {
+            write(fd, " ", 1);  // Add space between words
+        }
+    }
+    write(fd, "\n", 1); // Append a newline at the end
+    close(fd);
+}
 void echowrite(char **args) {}
 void _read(char **args) {}
 void wordCount(char **args) {}
