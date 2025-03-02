@@ -56,10 +56,11 @@ int main(int argc, char const *argv[])
         {
             cp(arguments);
         }
-        else if (strcmp(input, "delete") == 0)
+        else if (strcmp(arguments[0], "delete") == 0) 
         {
             delete(arguments);
         }
+        
         else if (strcmp(input, "dir") == 0)
         {
             get_dir();

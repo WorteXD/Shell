@@ -91,7 +91,20 @@ void cd(char **args);
  */
 void cp(char **args);
 void get_dir();
-void delete(char **arguments);
+/**
+ * Deletes a specified file from the system.
+ *
+ * This function attempts to delete a file using the `remove()` system call.
+ * If successful, it prints a confirmation message. If the file does not exist
+ * or another error occurs, it displays an error message.
+ *
+ * @param args A pointer to the array of command arguments.
+ *             The second element (`args[1]`) should contain the filename.
+ *
+ * @note This function does not support deleting directories.
+ * @warning Ensure the correct file is specified to prevent unintended deletion.
+ */
+void delete(char **args);
 void systemCall(char **arguments);
 void mypipe(char **, char **);
 void move(char **args);

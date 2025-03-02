@@ -230,8 +230,15 @@ void get_dir()
         printf("%s ", ent->d_name);
     puts("");
 }
-void delete(char **arguments)
-{
-    if (unlink(arguments[1]) != 0)
-        printf("-myShell: delete: %s: No such file or directory\n", arguments[1]);
+void delete(char **args) {
+    if (args[1] == NULL) {
+        printf("-myShell: delete: missing operand\n");
+        return;
+    }
+   
+    if (remove(args[1]) == 0) {
+        printf("-myShell: '%s' deleted successfully\n", args[1]);
+    } else {
+        perror("-myShell: delete");
+    }
 }
