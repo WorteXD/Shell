@@ -124,30 +124,52 @@ void systemCall(char **arguments)
     }
 }
 
-void mypipe(char **argv1, char **argv2)
-{
-
+void mypipe(char **args1, char **args2) {
     int fd[2];
-
-    if (fork() == 0)
-    {
-        pipe(fd);
-        if (fork() == 0)
-        {
-
-            close(STDOUT_FILENO);
-            dup2(fd[1], STDOUT_FILENO);
-            close(fd[1]);
-            close(fd[0]);
-            execvp(argv1[0], argv1);
-        }
-
-        close(STDIN_FILENO);
-        dup(fd[0]);
-        close(fd[1]);
-        close(fd[0]);
-        execvp(argv2[0], argv2);
+    if (pipe(fd) == -1) {
+        perror("-myShell: pipe");
+        return;
     }
+
+    pid_t pid1 = fork();
+    if (pid1 == -1) {
+        perror("-myShell: fork");
+        return;
+    }
+
+    if (pid1 == 0) {  // First child process
+        close(fd[0]);  // Close unused read end
+        dup2(fd[1], STDOUT_FILENO);  // Redirect stdout to pipe write end
+        close(fd[1]);  // Close write end after dup2
+
+        if (execvp(args1[0], args1) == -1) {
+            perror("-myShell: execvp");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    pid_t pid2 = fork();
+    if (pid2 == -1) {
+        perror("-myShell: fork");
+        return;
+    }
+
+    if (pid2 == 0) {  // Second child process
+        close(fd[1]);  // Close unused write end
+        dup2(fd[0], STDIN_FILENO);  // Redirect stdin to pipe read end
+        close(fd[0]);  // Close read end after dup2
+
+        if (execvp(args2[0], args2) == -1) {
+            perror("-myShell: execvp");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    close(fd[0]);
+    close(fd[1]);
+
+    wait(NULL);
+    wait(NULL);
 }
 
 void move(char **args) {}

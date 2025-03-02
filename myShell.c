@@ -4,45 +4,50 @@
 int main(int argc, char const *argv[])
 {
     welcome();
-    
+
     char *input;
-    char **arguments = NULL;  // ✅ Ensure arguments is declared before use
+    char **arguments = NULL; //  Ensure arguments is declared before use
 
     while (1)
     {
         int isPipe = 2;
         int isEchoWrith = 0;
         int isEchoPpend = 0;
-    
+        ;
+
         getLocation();
-    
+
         char *input = getInputFromUser();
-        if (input == NULL) {            
+        if (input == NULL)
+        {
             break;
         }
-    
+
         char **arguments = splitArguments(input);
-        if (arguments == NULL || arguments[0] == NULL) {
+        if (arguments == NULL || arguments[0] == NULL)
+        {
             free(input);
             continue;
         }
-    
-        // ✅ Fix: Handle "exit" properly
-        if (strncmp(arguments[0], "exit", 4) == 0) {
+
+        //  Fix: Handle "exit" properly
+        if (strncmp(arguments[0], "exit", 4) == 0)
+        {
             logout(input);
             free(input);
             free(arguments);
-            exit(0);  // ✅ Shell process is fully terminated
+            exit(0); //  Shell process is fully terminated
         }
-    
-        // ✅ Fix: Ensure "cd" command works correctly
-        if (strncmp(arguments[0], "cd", 2) == 0) {
+
+        //  Fix: Ensure "cd" command works correctly
+        if (strncmp(arguments[0], "cd", 2) == 0)
+        {
             cd(arguments);
             free(input);
             free(arguments);
-            continue;  // ✅ Ensures the loop continues running after cd()
+            continue; //  Ensures the loop continues running after cd()
         }
-    
+
         else if (strncmp(input, "echo", 4) == 0)
         {
             if (isEchoWrith)
@@ -56,40 +61,65 @@ int main(int argc, char const *argv[])
         {
             cp(arguments);
         }
-        else if (strcmp(arguments[0], "delete") == 0) 
+        else if (strcmp(arguments[0], "delete") == 0)
         {
-            delete(arguments);
+            delete (arguments);
         }
-        
-        else if (strcmp(arguments[0], "dir") == 0) 
+
+        else if (strcmp(arguments[0], "dir") == 0)
         {
             get_dir();
         }
-        else if (isPipe)
+
+        int pipe_pos = -1; // Use an integer instead of a pointer
+
+        for (int i = 0; arguments[i] != NULL; i++)
         {
-            mypipe(arguments, arguments + isPipe + 1);
+            if (strcmp(arguments[i], "|") == 0)
+            {
+                pipe_pos = i;
+                arguments[i] = NULL;
+                break;
+            }
+        }
+
+        if (pipe_pos != -1)
+        {
+            mypipe(arguments, &arguments[pipe_pos + 1]);
         }
         else
         {
-            systemCall(arguments);
-            wait(NULL);
+            int pid = fork();
+            if (pid == 0)
+            {
+                systemCall(arguments);
+                exit(0);
+            }
+            else if (pid > 0)
+            {
+                wait(NULL);
+            }
+            else
+            {
+                perror("-myShell: fork failed");
+            }
         }
-    
-        // ✅ Fix: Free memory properly after execution
-        if (arguments) {
-            for (int i = 0; arguments[i] != NULL; i++) {
+
+        //  Fix: Free memory properly after execution
+        if (arguments)
+        {
+            for (int i = 0; arguments[i] != NULL; i++)
+            {
                 free(arguments[i]);
             }
             free(arguments);
         }
-    
-        free(input);  // ✅ Free input only once per loop
+
+        free(input); //  Free input only once per loop
     }
-    
 
     return 0;
 }
-
 
 void welcome()
 {

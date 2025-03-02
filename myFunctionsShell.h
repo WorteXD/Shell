@@ -116,7 +116,20 @@ void get_dir();
  */
 void delete(char **args);
 void systemCall(char **arguments);
-void mypipe(char **, char **);
+/**
+ * Executes two commands with a pipe between them.
+ *
+ * This function creates a pipe, forks two child processes, and redirects
+ * the output of the first command to the input of the second command.
+ * The two commands are executed using `execvp()`.
+ *
+ * @param args1 First command and its arguments (NULL-terminated array)
+ * @param args2 Second command and its arguments (NULL-terminated array)
+ *
+ * @note The function handles `pipe()`, `fork()`, `dup2()`, and `execvp()`.
+ *       Both child processes will be waited on using `wait()`.
+ */
+void mypipe(char **args1, char **args2);
 void move(char **args);
 void echoppend(char **args);
 void echowrite(char **args);
