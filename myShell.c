@@ -30,15 +30,6 @@ int main(int argc, char const *argv[])
             continue;
         }
 
-        //  Fix: Handle "exit" properly
-        if (strncmp(arguments[0], "exit", 4) == 0)
-        {
-            logout(input);
-            free(input);
-            free(arguments);
-            exit(0); //  Shell process is fully terminated
-        }
-
         //  Fix: Ensure "cd" command works correctly
         if (strncmp(arguments[0], "cd", 2) == 0)
         {
@@ -52,7 +43,7 @@ int main(int argc, char const *argv[])
         {
             if (isEchoWrith)
                 echowrite(arguments);
-            else if (strncmp(input, "echoppend", 9) == 0)
+            else if (strcmp(arguments[0], "echoppend") == 0)
             {
                 echoppend(arguments);
             }
@@ -79,7 +70,6 @@ int main(int argc, char const *argv[])
         }
 
         int pipe_pos = -1; // Use an integer instead of a pointer
-
         for (int i = 0; arguments[i] != NULL; i++)
         {
             if (strcmp(arguments[i], "|") == 0)
@@ -94,24 +84,17 @@ int main(int argc, char const *argv[])
         {
             mypipe(arguments, &arguments[pipe_pos + 1]);
         }
-        else
+        
+
+        if (strncmp(arguments[0], "exit", 4) == 0)
         {
-            int pid = fork();
-            if (pid == 0)
-            {
-                systemCall(arguments);
-                exit(0);
-            }
-            else if (pid > 0)
-            {
-                wait(NULL);
-            }
-            else
-            {
-                perror("-myShell: fork failed");
-            }
+            logout(input); // logout() already calls exit(0), so we must stop execution.
+            free(arguments);
+            free(input);
+            return 0; // Prevents further execution.
         }
 
+        
         //  Fix: Free memory properly after execution
         if (arguments)
         {

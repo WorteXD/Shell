@@ -76,54 +76,29 @@ void getLocation() {
     fflush(stdout);
 }
 
-void logout(char *input) {
-    char **args = splitArguments(input);  // ✅ Use splitArguments() for proper parsing
-
-    if (args[0] && strcmp(args[0], "exit") == 0) {
-        if (args[1] == NULL) {  // ✅ No extra words after "exit", so exit normally
-            printf("\033[1;31mExiting MyShell... Goodbye!\033[0m\n");
-            fflush(stdout);
-
-            // ✅ Free allocated memory before exiting
-            for (int i = 0; args[i] != NULL; i++) {
-                free(args[i]);
-            }
-            free(args);
-
-            exit(0);
-        } else {
-            printf("\033[1;33m[ERROR] Invalid usage: Use 'exit' without extra arguments.\033[0m\n");
-            fflush(stdout);
-        }
-    }
-
-    // ✅ Free memory allocated by splitArguments()
-    for (int i = 0; args[i] != NULL; i++) {
-        free(args[i]);
-    }
-    free(args);
-}
 
 
-void systemCall(char **arguments)
-{
-    puts("systemCall");
-    pid_t pid = fork();
-    if (pid == -1)
-    {
-        perror("fork err");
+
+void systemCall(char **arguments) {
+    if (arguments == NULL || arguments[0] == NULL) {
         return;
     }
 
-    if (pid == 0)
-    {
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("-myShell: fork");
+        return;
+    }
 
-        if (execvp(arguments[0], arguments) == -1)
-        {
-            exit(EXIT_FAILURE);
-        }
+    if (pid == 0) {
+        execvp(arguments[0], arguments);
+        perror("-myShell: execvp");
+        exit(EXIT_FAILURE);
+    } else {
+        wait(NULL);
     }
 }
+
 
 void mypipe(char **args1, char **args2) {
     int fd[2];
@@ -168,9 +143,10 @@ void mypipe(char **args1, char **args2) {
 
     close(fd[0]);
     close(fd[1]);
+    
+    wait(NULL);
+    dup2(STDOUT_FILENO, fileno(stdout)); // ✅ Restore stdout
 
-    wait(NULL);
-    wait(NULL);
 }
 
 void move(char **args) {
@@ -337,4 +313,31 @@ void delete(char **args) {
         perror("-myShell: delete");
     }
     
+}
+void logout(char *input) {
+    char **args = splitArguments(input);  //  Use splitArguments() for proper parsing
+
+    if (args[0] && strcmp(args[0], "exit") == 0) {
+        if (args[1] == NULL) {  //  No extra words after "exit", so exit normally
+            printf("\033[1;31mExiting MyShell... Goodbye!\033[0m\n");
+            fflush(stdout);
+
+            //  Free allocated memory before exiting
+            for (int i = 0; args[i] != NULL; i++) {
+                free(args[i]);
+            }
+            free(args);
+
+            exit(0);
+        } else {
+            printf("\033[1;33m[ERROR] Invalid usage: Use 'exit' without extra arguments.\033[0m\n");
+            fflush(stdout);
+        }
+    }
+
+    //  Free memory allocated by splitArguments()
+    for (int i = 0; args[i] != NULL; i++) {
+        free(args[i]);
+    }
+    free(args);
 }
