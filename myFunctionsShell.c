@@ -216,7 +216,26 @@ void echowrite(char **args) {
     close(fd);
 }
 
-void _read(char **args) {}
+void _read(char **args) {
+    if (args[1] == NULL) {
+        printf("-myShell: read: missing file operand\n");
+        return;
+    }
+
+    FILE *file = fopen(args[1], "r");
+    if (file == NULL) {
+        perror("-myShell: read");
+        return;
+    }
+
+    char buffer[1024];
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        printf("%s", buffer);
+    }
+
+    fclose(file);
+}
+
 void wordCount(char **args) {}
 
 void echo(char **arguments)

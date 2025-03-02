@@ -158,17 +158,30 @@ void move(char **args);
  */
 void echoppend(char **args);
 /**
- * echowrite - Writes the provided text into a file, overwriting existing content.
- * 
- * @args: An array of strings where:
- *        - args[0]: "echowrite"
- *        - args[1]: The filename
- *        - args[2..n]: The content to write into the file
- * 
- * Example usage:
- *   echowrite myfile.txt Hello World
- *   (Writes "Hello World" into myfile.txt, replacing any existing content)
+ * Writes content to a file, overwriting any existing content.
+ *
+ * @param args The command arguments. Expected format: echowrite <filename> <text>
+ *             - args[1]: The file to write to.
+ *             - args[2+]: The text to be written to the file.
+ *
+ * Function behavior:
+ * - Opens the specified file in write mode (creates the file if it does not exist).
+ * - Writes the provided text into the file.
+ * - Replaces existing content in the file.
+ * - Handles errors such as missing arguments or inability to open the file.
  */
 void echowrite(char **args);
+void echowrite(char **args);
+/**
+ * Reads the contents of a file and prints them to the standard output.
+ *
+ * @param args The command arguments. Expected format: read <filename>
+ *             - args[1]: The file to read from.
+ *
+ * Function behavior:
+ * - Opens the specified file in read mode.
+ * - Reads and prints its content line by line.
+ * - Handles errors such as missing arguments or inability to open the file.
+ */
 void _read(char **args);
 void wordCount(char **args);

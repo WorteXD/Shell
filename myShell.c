@@ -64,7 +64,10 @@ int main(int argc, char const *argv[])
         {
             delete (arguments);
         }
-
+        else if (strcmp(arguments[0], "read") == 0) {
+            _read(arguments);
+        }
+        
         else if (strcmp(arguments[0], "dir") == 0)
         {
             get_dir();
