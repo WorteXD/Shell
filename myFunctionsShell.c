@@ -194,7 +194,28 @@ void echoppend(char **args) {
     write(fd, "\n", 1); // Append a newline at the end
     close(fd);
 }
-void echowrite(char **args) {}
+void echowrite(char **args) {
+    if (args[1] == NULL || args[2] == NULL) {
+        perror("-myShell: echowrite: missing arguments");
+        return;
+    }
+
+    int fd = open(args[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("-myShell: echowrite: error opening file");
+        return;
+    }
+
+    for (int i = 2; args[i] != NULL; i++) {
+        write(fd, args[i], strlen(args[i]));
+        if (args[i + 1] != NULL) {
+            write(fd, " ", 1);  // Add space between words
+        }
+    }
+    write(fd, "\n", 1); // Write a newline at the end
+    close(fd);
+}
+
 void _read(char **args) {}
 void wordCount(char **args) {}
 

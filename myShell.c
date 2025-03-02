@@ -39,18 +39,19 @@ int main(int argc, char const *argv[])
             continue; //  Ensures the loop continues running after cd()
         }
 
-        else if (strncmp(input, "echo", 4) == 0)
+        else if (strcmp(arguments[0], "echowrite") == 0)
         {
-            if (isEchoWrith)
-                echowrite(arguments);
-            else if (strcmp(arguments[0], "echoppend") == 0)
-            {
-                echoppend(arguments);
-            }
-
-            else
-                echo(arguments);
+            echowrite(arguments);
         }
+        else if (strcmp(arguments[0], "echoppend") == 0)
+        {
+            echoppend(arguments);
+        }
+        else if (strcmp(arguments[0], "echo") == 0)
+        {
+            echo(arguments);
+        }
+
         else if (strcmp(arguments[0], "mv") == 0)
         {
             move(arguments);
@@ -84,7 +85,6 @@ int main(int argc, char const *argv[])
         {
             mypipe(arguments, &arguments[pipe_pos + 1]);
         }
-        
 
         if (strncmp(arguments[0], "exit", 4) == 0)
         {
@@ -94,7 +94,6 @@ int main(int argc, char const *argv[])
             return 0; // Prevents further execution.
         }
 
-        
         //  Fix: Free memory properly after execution
         if (arguments)
         {

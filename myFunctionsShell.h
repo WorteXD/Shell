@@ -157,6 +157,18 @@ void move(char **args);
  * @param args The command-line arguments, where args[1] is the filename and args[2+] is the text to append.
  */
 void echoppend(char **args);
+/**
+ * echowrite - Writes the provided text into a file, overwriting existing content.
+ * 
+ * @args: An array of strings where:
+ *        - args[0]: "echowrite"
+ *        - args[1]: The filename
+ *        - args[2..n]: The content to write into the file
+ * 
+ * Example usage:
+ *   echowrite myfile.txt Hello World
+ *   (Writes "Hello World" into myfile.txt, replacing any existing content)
+ */
 void echowrite(char **args);
 void _read(char **args);
 void wordCount(char **args);
