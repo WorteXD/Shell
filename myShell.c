@@ -52,7 +52,7 @@ int main(int argc, char const *argv[])
             else
                 echo(arguments);
         }
-        else if (strcmp(input, "cp") == 0)
+        else if (strncmp(arguments[0], "cp", 2) == 0)
         {
             cp(arguments);
         }

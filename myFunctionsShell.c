@@ -187,28 +187,35 @@ void cd(char **arguments) {
         printf("-myShell: cd: %s: %s\n", path, strerror(errno));    
     }
 }
-
-void cp(char **arguments)
-{
-    char ch;
-    FILE *src, *des;
-    if ((src = fopen(arguments[1], "r")) == NULL)
-    {
-        puts("error");
+void cp(char **args) {
+    if (args[1] == NULL || args[2] == NULL) {
+        printf("-myShell: cp: missing file operand\n");
         return;
     }
 
-    if ((des = fopen(arguments[2], "w")) == NULL)
-    {
-        puts("error");
-        fclose(src);
+    FILE *source = fopen(args[1], "rb");
+    if (source == NULL) {
+        printf("-myShell: cp: cannot open source file '%s'\n", args[1]);
         return;
     }
-    while ((ch = fgetc(src)) != EOF)
-        fputc(ch, des);
 
-    fclose(src);
-    fclose(des);
+    FILE *destination = fopen(args[2], "wb");
+    if (destination == NULL) {
+        printf("-myShell: cp: cannot open destination file '%s'\n", args[2]);
+        fclose(source);
+        return;
+    }
+
+    char buffer[1024];
+    size_t bytesRead;
+    while ((bytesRead = fread(buffer, 1, sizeof(buffer), source)) > 0) {
+        fwrite(buffer, 1, bytesRead, destination);
+    }
+
+    fclose(source);
+    fclose(destination);
+
+    printf("-myShell: cp: successfully copied '%s' to '%s'\n", args[1], args[2]);
 }
 void get_dir()
 {

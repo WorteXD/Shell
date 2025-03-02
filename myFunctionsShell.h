@@ -72,7 +72,24 @@ void echo(char **arguments);
  * @warning Ensure the input is valid to prevent errors.
  */
 void cd(char **args);
-void cp(char **arguments);
+/**
+ * Copies a file from a source path to a destination path.
+ *
+ * This function takes two arguments: the source file path and the destination file path.
+ * It reads the contents of the source file and writes them into the destination file.
+ * If the destination file already exists, it will be overwritten.
+ *
+ * @param args A pointer to an array of strings (char**), where:
+ *             args[1] is the source file path
+ *             args[2] is the destination file path
+ *
+ * @return void
+ *
+ * @note If the source file does not exist, an error message is printed.
+ *       If the user lacks the necessary permissions, an error message is printed.
+ *       Proper file handling ensures no memory leaks.
+ */
+void cp(char **args);
 void get_dir();
 void delete(char **arguments);
 void systemCall(char **arguments);
