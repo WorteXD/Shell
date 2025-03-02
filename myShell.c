@@ -57,6 +57,10 @@ int main(int argc, char const *argv[])
             else
                 echo(arguments);
         }
+        else if (strcmp(arguments[0], "mv") == 0) 
+        {
+            move(arguments);
+        }
         else if (strncmp(arguments[0], "cp", 2) == 0)
         {
             cp(arguments);

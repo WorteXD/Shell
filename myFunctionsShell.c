@@ -172,7 +172,30 @@ void mypipe(char **args1, char **args2) {
     wait(NULL);
 }
 
-void move(char **args) {}
+void move(char **args) {
+    if (args[1] == NULL || args[2] == NULL) {
+        printf("-myShell: mv: missing file operand\n");
+        return;
+    }
+
+    char source[256] = "";
+    char destination[256] = "";
+
+    // Merge arguments if the filename has spaces
+    int i = 1;
+    while (args[i + 1] != NULL) {
+        strcat(source, args[i]);
+        if (args[i + 2] != NULL) strcat(source, " ");
+        i++;
+    }
+    strcpy(destination, args[i]);
+
+    // Perform rename
+    if (rename(source, destination) != 0) {
+        perror("-myShell: mv");
+    }
+}
+
 void echoppend(char **args) {}
 void echowrite(char **args) {}
 void _read(char **args) {}
