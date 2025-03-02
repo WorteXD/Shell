@@ -55,7 +55,6 @@ void getLocation();
  * @note If the input contains extra text after "exit", an error message is displayed.
  */
 void logout(char *input);
-
 void echo(char **arguments);
 /**
  * Changes the current working directory of the shell.
@@ -171,7 +170,6 @@ void echoppend(char **args);
  * - Handles errors such as missing arguments or inability to open the file.
  */
 void echowrite(char **args);
-void echowrite(char **args);
 /**
  * Reads the contents of a file and prints them to the standard output.
  *
@@ -184,4 +182,14 @@ void echowrite(char **args);
  * - Handles errors such as missing arguments or inability to open the file.
  */
 void _read(char **args);
+/**
+ * wordCount - Counts words, lines, or bytes in a file.
+ * @args: Command arguments. Requires:
+ *        args[1] - File path
+ *        args[2] - Option: "-w" for words, "-l" for lines, "-c" for bytes
+ * 
+ * If no file is provided, prints an error.
+ * If no option is provided, prints an error.
+ * If an invalid option is given, prints an error.
+ */
 void wordCount(char **args);

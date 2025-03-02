@@ -70,7 +70,7 @@ void getLocation() {
 
     char *username = getenv("USER");
 
-    // ✅ Color Fix: Make the username cyan and the path yellow
+    //  Color Fix: Make the username cyan and the path yellow
     printf("\033[1;36m%s@%s:\033[1;33m%s\033[0m$ ", 
            username, hostname, cwd);
     fflush(stdout);
@@ -145,7 +145,7 @@ void mypipe(char **args1, char **args2) {
     close(fd[1]);
     
     wait(NULL);
-    dup2(STDOUT_FILENO, fileno(stdout)); // ✅ Restore stdout
+    dup2(STDOUT_FILENO, fileno(stdout)); //  Restore stdout
 
 }
 
@@ -236,7 +236,47 @@ void _read(char **args) {
     fclose(file);
 }
 
-void wordCount(char **args) {}
+void wordCount(char **args) {
+    if (args[1] == NULL) {
+        printf("-myShell: wc: missing file operand\n");
+        return;
+    }
+
+    if (args[2] == NULL) {
+        printf("-myShell: wc: missing option. Please use '-c' for bytes, '-l' for lines, or '-w' for words.\n");
+        return;
+    }
+
+    FILE *file = fopen(args[1], "r");
+    if (file == NULL) {
+        perror("-myShell: wc");
+        return;
+    }
+
+    int bytes = 0, words = 0, lines = 0;
+    char c, prev = '\0';
+
+    while ((c = fgetc(file)) != EOF) {
+        bytes++;
+        if (c == '\n') lines++;
+        if ((c == ' ' || c == '\n' || c == '\t') && (prev != ' ' && prev != '\n' && prev != '\t')) {
+            words++;
+        }
+        prev = c;
+    }
+    fclose(file);
+
+    if (strcmp(args[2], "-c") == 0) {
+        printf("Bytes: %d\n", bytes);
+    } else if (strcmp(args[2], "-l") == 0) {
+        printf("Lines: %d\n", lines);
+    } else if (strcmp(args[2], "-w") == 0) {
+        printf("Words: %d\n", words);
+    } else {
+        printf("-myShell: wc: invalid option '%s'. Use '-c', '-l', or '-w'.\n", args[2]);
+    }
+}
+
 
 void echo(char **arguments)
 {
