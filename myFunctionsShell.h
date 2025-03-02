@@ -90,6 +90,16 @@ void cd(char **args);
  *       Proper file handling ensures no memory leaks.
  */
 void cp(char **args);
+/**
+ * Lists the contents of the current directory.
+ *
+ * This function opens the current directory and prints each file
+ * and folder name in a single line. It uses `opendir()` to open
+ * the directory and `readdir()` to read its contents.
+ *
+ * @note Hidden files (starting with `.`) will also be displayed.
+ * @warning Ensure the directory exists before calling this function.
+ */
 void get_dir();
 /**
  * Deletes a specified file from the system.

@@ -61,7 +61,7 @@ int main(int argc, char const *argv[])
             delete(arguments);
         }
         
-        else if (strcmp(input, "dir") == 0)
+        else if (strcmp(arguments[0], "dir") == 0) 
         {
             get_dir();
         }

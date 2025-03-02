@@ -217,18 +217,20 @@ void cp(char **args) {
 
     printf("-myShell: cp: successfully copied '%s' to '%s'\n", args[1], args[2]);
 }
-void get_dir()
+void get_dir() 
 {
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir("./")) == NULL)
-    {
-        perror("");
-        return;
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(".");
+    if (d) {
+        while ((dir = readdir(d)) != NULL) {
+            printf("%s  ", dir->d_name);
+        }
+        printf("\n");
+        closedir(d);
+    } else {
+        perror("-myShell: dir");
     }
-    while ((ent = readdir(dir)) != NULL)
-        printf("%s ", ent->d_name);
-    puts("");
 }
 void delete(char **args) {
     if (args[1] == NULL) {
