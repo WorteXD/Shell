@@ -5,6 +5,9 @@
 #include <limits.h>
 #include <pwd.h>        // Required for getpwuid()
 #include <sys/types.h>  // Required for user ID functions
+#include <sys/stat.h>
+
+
 char *getInputFromUser()
 {
 
@@ -173,16 +176,16 @@ void cd(char **arguments) {
         return;
     }
 
-    // ✅ Join arguments into a valid path using `/`
+    //  Join arguments into a valid path using `/`
     char path[1024] = "";
     for (int i = 1; arguments[i] != NULL; i++) {
         strcat(path, arguments[i]);
         if (arguments[i + 1] != NULL) {
-            strcat(path, "/");  // ✅ Join folders with `/`
+            strcat(path, "/");  //  Join folders with `/`
         }
     }
 
-        // ✅ Try to change directory
+        //  Try to change directory
     if (chdir(path) != 0) {
         printf("-myShell: cd: %s: %s\n", path, strerror(errno));    
     }
@@ -233,14 +236,39 @@ void get_dir()
     }
 }
 void delete(char **args) {
-    if (args[1] == NULL) {
-        printf("-myShell: delete: missing operand\n");
+    if (args[1] == NULL) 
+    {
+        printf("-myShell: delete: missing file operand\n");
         return;
     }
-   
+    
+    for (int i = 2; args[i] != NULL; i++) {
+        struct stat path_stat;
+        stat(args[i], &path_stat);
+        if (S_ISDIR(path_stat.st_mode)) {
+            printf("-myShell: delete: cannot remove '%s': Is a directory\n", args[i]);
+            continue;
+        }
+    
+        if (remove(args[i]) == 0) {
+            printf("Deleted successfully: %s\n", args[i]);
+        } else {
+            perror("-myShell: delete");
+        }
+    }
+    
+    struct stat path_stat;
+    stat(args[1], &path_stat);
+    if (S_ISDIR(path_stat.st_mode)) 
+    {
+        printf("-myShell: delete: cannot remove '%s': Is a directory\n", args[1]);
+        return;
+    }
+    
     if (remove(args[1]) == 0) {
-        printf("-myShell: '%s' deleted successfully\n", args[1]);
+        printf("Deleted successfully: %s\n", args[1]);
     } else {
         perror("-myShell: delete");
     }
+    
 }
