@@ -10,10 +10,6 @@ int main(int argc, char const *argv[])
 
     while (1)
     {
-        int isPipe = 2;
-        int isEchoWrith = 0;
-        int isEchoPpend = 0;
-        ;
 
         getLocation();
 
@@ -99,18 +95,22 @@ int main(int argc, char const *argv[])
             free(input);
             return 0; // Prevents further execution.
         }
-
-        //  Fix: Free memory properly after execution
-        if (arguments)
-        {
-            for (int i = 0; arguments[i] != NULL; i++)
-            {
-                free(arguments[i]);
-            }
-            free(arguments);
+        if (arguments[0] != NULL) {
+            systemCall(arguments);
         }
-
-        free(input); //  Free input only once per loop
+        
+        // Now free memory
+        if (arguments)
+{
+    for (int i = 0; arguments[i] != NULL; i++)
+    {
+        free(arguments[i]);
+    }
+    free(arguments);
+}
+free(input);
+      
+        
     }
 
     return 0;

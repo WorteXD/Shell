@@ -30,7 +30,7 @@ char **splitArguments(char *str)
 {
     if (str == NULL) return NULL;
 
-    int size = 10;  // Initial size of the array
+    int size = 10;
     int index = 0;
     char **args = malloc(size * sizeof(char *));
     if (!args) {
@@ -41,22 +41,25 @@ char **splitArguments(char *str)
     char *token = strtok(str, " ");
     while (token) {
         if (index >= size - 1) {
-            size *= 2;  // Double the size if needed
-            args = realloc(args, size * sizeof(char *));
-            if (!args) {
+            size *= 2;
+            char **new_args = realloc(args, size * sizeof(char *));
+            if (!new_args) {
                 perror("realloc failed");
+                free(args);
                 return NULL;
             }
+            args = new_args;
         }
 
-        args[index] = strdup(token); // Copy token into allocated memory
+        args[index] = strdup(token);
         index++;
         token = strtok(NULL, " ");
     }
-    args[index] = NULL; // Null-terminate the array
+    args[index] = NULL; // ✅ Ensure NULL-termination
 
     return args;
 }
+
 
 void getLocation() {
     char cwd[1024];
@@ -81,8 +84,16 @@ void getLocation() {
 
 void systemCall(char **arguments) {
     if (arguments == NULL || arguments[0] == NULL) {
+        printf("-myShell: No command entered.\n");
         return;
     }
+
+    // Ensure arguments array is NULL-terminated
+    int i = 0;
+    while (arguments[i] != NULL) {
+        i++;
+    }
+    arguments[i] = NULL; // Explicitly terminate with NULL
 
     pid_t pid = fork();
     if (pid == -1) {
@@ -90,14 +101,18 @@ void systemCall(char **arguments) {
         return;
     }
 
-    if (pid == 0) {
+    if (pid == 0) { // Child process
         execvp(arguments[0], arguments);
-        perror("-myShell: execvp");
+        perror("-myShell: command not found"); // Print error if execvp fails
         exit(EXIT_FAILURE);
-    } else {
-        wait(NULL);
+    } 
+    else { // Parent process
+        int status;
+        waitpid(pid, &status, 0);
     }
 }
+
+
 
 
 void mypipe(char **args1, char **args2) {
@@ -142,8 +157,18 @@ void mypipe(char **args1, char **args2) {
     }
 
     close(fd[0]);
-    close(fd[1]);
-    
+close(fd[1]);
+
+int status1, status2;
+waitpid(pid1, &status1, 0);
+waitpid(pid2, &status2, 0);
+
+if (WIFEXITED(status1) && WEXITSTATUS(status1) != 0) {
+    printf("-myShell: First command in pipe failed\n");
+}
+if (WIFEXITED(status2) && WEXITSTATUS(status2) != 0) {
+    printf("-myShell: Second command in pipe failed\n");
+}
     wait(NULL);
     dup2(STDOUT_FILENO, fileno(stdout)); //  Restore stdout
 
