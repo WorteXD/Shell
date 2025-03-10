@@ -5,9 +5,6 @@ int main(int argc, char const *argv[])
 {
     welcome();
 
-    char *input;
-    char **arguments = NULL; //  Ensure arguments is declared before use
-
     while (1)
     {
 
@@ -35,38 +32,155 @@ int main(int argc, char const *argv[])
             continue; //  Ensures the loop continues running after cd()
         }
 
-        else if (strcmp(arguments[0], "echowrite") == 0)
-        {
-            echowrite(arguments);
-        }
-        else if (strcmp(arguments[0], "echoppend") == 0)
-        {
-            echoppend(arguments);
-        }
         else if (strcmp(arguments[0], "echo") == 0)
         {
-            echo(arguments);
+            int redirect_pos = -1;
+            int append = 0;
+
+            for (int i = 1; arguments[i] != NULL; i++)
+            {
+                if (strcmp(arguments[i], ">") == 0)
+                {
+                    redirect_pos = i;
+                    append = 0;
+                    break;
+                }
+                else if (strcmp(arguments[i], ">>") == 0)
+                {
+                    redirect_pos = i;
+                    append = 1;
+                    break;
+                }
+            }
+
+            if (redirect_pos != -1)
+            {
+                if (arguments[redirect_pos + 1] == NULL)
+                {
+                    printf("-myShell: echo: missing file operand\n");
+                }
+                else
+                {
+                    char filename[1024] = {0};
+                    char content[1024] = {0};
+
+                    // Extract filename correctly, removing quotes
+                    int j = redirect_pos + 1;
+                    while (arguments[j] != NULL)
+                    {
+                        strcat(filename, arguments[j]);
+                        if (arguments[j + 1] != NULL)
+                            strcat(filename, " ");
+                        j++;
+                    }
+
+                    // ✅ Remove quotes from filename
+                    if (filename[0] == '"' && filename[strlen(filename) - 1] == '"')
+                    {
+                        filename[strlen(filename) - 1] = '\0';             // Remove trailing quote
+                        memmove(filename, filename + 1, strlen(filename)); // Shift left to remove first quote
+                    }
+
+                    // Extract text before '>' or '>>'
+                    for (int i = 1; i < redirect_pos; i++)
+                    {
+                        strcat(content, arguments[i]);
+                        strcat(content, " ");
+                    }
+                    content[strlen(content) - 1] = '\0'; // Remove last extra space
+
+                    char *args[] = {filename, content, NULL};
+                    if (append)
+                    {
+                        echoppend(args);
+                    }
+                    else
+                    {
+                        echowrite(args);
+                    }
+                }
+            }
+
+            else if (redirect_pos == -1) // ✅ Prevents unnecessary terminal printing
+            {
+                for (int i = 1; arguments[i] != NULL; i++)
+                {
+                    printf("%s ", arguments[i]);
+                }
+                printf("\n");
+            }
         }
 
         else if (strcmp(arguments[0], "mv") == 0)
         {
             move(arguments);
+            free(input);
+            free(arguments);
+            continue;
         }
-        else if (strncmp(arguments[0], "cp", 2) == 0)
+        else if (strcmp(arguments[0], "cp") == 0)
         {
             cp(arguments);
+            free(input);
+            free(arguments);
+            continue;
         }
+
         else if (strcmp(arguments[0], "delete") == 0)
         {
             delete (arguments);
+            free(input);
+            free(arguments);
+            continue;
         }
-        else if (strcmp(arguments[0], "read") == 0) {
-            _read(arguments);
+        else if (strcmp(arguments[0], "read") == 0)
+        {
+            if (arguments[1] == NULL)
+            {
+                printf("-myShell: read: missing file operand\n");
+            }
+            else
+            {
+                char filename[1024] = {0};
+                char directory[1024] = {0};
+
+                // If there is a second argument and it ends with '/', treat it as a directory
+                if (arguments[2] != NULL && arguments[2][strlen(arguments[2]) - 1] == '/')
+                {
+                    strcpy(directory, arguments[2]);
+                }
+
+                strcpy(filename, arguments[1]);
+
+                // Remove quotes if present
+                if (filename[0] == '"' && filename[strlen(filename) - 1] == '"')
+                {
+                    filename[strlen(filename) - 1] = '\0';
+                    memmove(filename, filename + 1, strlen(filename));
+                }
+
+                char *args[] = {filename, directory[0] ? directory : NULL, NULL};
+                _read(args);
+            }
+            continue;
         }
-        else if (strcmp(arguments[0], "wc") == 0) {
-            wordCount(arguments);
-        }
-             
+
+        else if (strcmp(arguments[0], "wc") == 0)
+{
+    if (arguments[1] == NULL || arguments[2] == NULL)
+    {
+        printf("-myShell: wc: missing file operand or option\n");
+    }
+    else
+    {
+        wordCount(arguments);
+    }
+    free(input);
+    free(arguments);
+    continue;
+}
+
+
         else if (strcmp(arguments[0], "dir") == 0)
         {
             get_dir();
@@ -95,22 +209,21 @@ int main(int argc, char const *argv[])
             free(input);
             return 0; // Prevents further execution.
         }
-        if (arguments[0] != NULL) {
+        if (arguments[0] != NULL)
+        {
             systemCall(arguments);
         }
-        
+
         // Now free memory
         if (arguments)
-{
-    for (int i = 0; arguments[i] != NULL; i++)
-    {
-        free(arguments[i]);
-    }
-    free(arguments);
-}
-free(input);
-      
-        
+        {
+            for (int i = 0; arguments[i] != NULL; i++)
+            {
+                free(arguments[i]);
+            }
+            free(arguments);
+        }
+        free(input);
     }
 
     return 0;
